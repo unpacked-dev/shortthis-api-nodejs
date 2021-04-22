@@ -8,14 +8,22 @@ FIREBASE_ADMIN.initializeApp({
 });
 
 const FIRESTORE = FIREBASE_ADMIN.firestore();
-const DATABASE_COLLECTION = FIRESTORE.collection('shortthis');
+const DATABASE = FIRESTORE.collection('shortthis');
 
-//Write Data
-DATABASE_COLLECTION.doc('testlink').set({
-    short: 'https://unpacked.dev',
-});
+//Get destination URL from short ID
+const getShort = (id) => {
+    DATABASE.doc(id).get()
+    .then((snap) => {
+        console.log(snap.data().url);
+    })
+    .catch((err) => {
+        console.log('Could not get short...');
+    });
+};
 
-//Get Data
-DATABASE_COLLECTION.doc('testlink').get().then((snapshot) => {
-    console.log(snapshot.data().short);
-});
+//Set destination URL to short ID
+const setShort = (id, url) => {
+    DATABASE.doc(id).set({
+        url: url,
+    });
+};

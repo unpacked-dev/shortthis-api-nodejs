@@ -11,19 +11,102 @@ const FIRESTORE = FIREBASE_ADMIN.firestore();
 const DATABASE = FIRESTORE.collection('shortthis');
 
 //Get destination URL from short ID
-const getShort = (id) => {
-    DATABASE.doc(id).get()
+const getShort = async (id) => {
+    return DATABASE.doc(id).get()
     .then((snap) => {
-        console.log(snap.data().url);
+        return snap.data().url;
     })
     .catch((err) => {
-        console.log('Could not get short...');
+        return null;
     });
 };
 
 //Set destination URL to short ID
-const setShort = (id, url) => {
-    DATABASE.doc(id).set({
+const setShort = async (id, url) => {
+    return DATABASE.doc(id).set({
         url: url,
+    })
+    .then((snap) => {
+        return true;
+    })
+    .catch((err) => {
+        return false;
     });
 };
+
+//Checks if URL is https (secure) URL
+const isSecureURL = (url) => {
+    return url.indexOf('https://') != -1 ? true : false;
+};
+
+//Upgrade unsecure (http://) URL to more secure (https://) URL
+const upgradeSecureURL = (url) => {
+    return url.replaceAll('http://', 'https://');
+}
+
+//Add https to URL which don't contain any
+const addHttp = (url) => {
+    return (url.indexOf('https://') == -1 && url.indexOf('http://') == -1) ? 'https://' + url : upgradeSecureURL(url);
+}
+
+//Express Server
+const express = require('express');
+const EXPRESS = express();
+EXPRESS.use(express.urlencoded({extended: true}));
+const EXPRESS_PORT = 3000;
+
+//Routing
+//Resolve URLs
+EXPRESS.get('/api/get/:id', (req, res) => {
+    const id = req.params.id;
+
+    getShort(id).then((snap) => {
+        if(snap) return res.send(snap)
+        else throw `Could not get destination of "${id}"`
+    }).catch((err) => {
+        return res.send(err);
+    });
+});
+
+//Create URls
+EXPRESS.post('/api/post', (req, res) => {
+    
+    //Read parameters
+    let id = req.body.id;
+    let url = req.body.url;
+
+    //Parameters may be invalid
+    if(!id) return res.send('Could not create shortlink. Invalid ID provided.');
+    else if(!url) return res.send('Could not create shortlink. Invalid URL provided.');
+
+    //ID already used?
+    getShort(id)
+    .then((snap) => {
+        if(!snap) return;
+        else throw 'Could not create shortlink. Shortlink id already in use.'
+
+    //Unused
+    }).then((snap) => {
+        //Do URL manipulation
+        url = addHttp(url); //Add secure https://
+
+        //Create URL
+        setShort(id, url)
+        .then((snap) => {
+            if(snap) return res.send('Shortlink successfully created.');
+            else throw 'Could not create shortlink. Check parameters or try again later.';
+        }).catch((err) => {
+            return res.end(err);
+        });
+    })
+
+    //Error if id is already used
+    .catch((err) => {
+        return res.end(err);
+    });
+});
+
+//Start Server
+EXPRESS.listen(EXPRESS_PORT, () => {
+    console.log(`Shortthis server listening at http://localhost:${EXPRESS_PORT}`)
+})

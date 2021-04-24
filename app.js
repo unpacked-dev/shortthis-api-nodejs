@@ -64,10 +64,13 @@ const generateUUID = () => {
 const generateShortlink = async (id, url, auth) => {
 
     //No URL => Exit
-    if(!url) return CONSTANTS.ERRORS.INVALID_URL_PROVIDED;
+    if(!url) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.INVALID_URL_PROVIDED;
+
+    //Manipulate URL
+    url = addHttp(url);
 
     //Check if any ID is provided
-    if(id && !auth) return CONSTANTS.ERRORS.NO_AUTH;
+    if(id && !auth) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.NO_AUTH;
 
     //Generate UUID if empty
     id = id ? id : generateUUID();
@@ -129,7 +132,7 @@ EXPRESS.post(CONFIG.ROUTES.POST_LINK, (req, res) => {
     let url = req.body.url;
     let auth = req.body.auth;
 
-    generateShortlink(id, url, 'auth')
+    generateShortlink(id, url, auth)
     .then((snap) => {
         if(snap) res.status(201).send(CONSTANTS.SUCCESS.SHORTLINK_CREATED);
         else throw snap;

@@ -1,0 +1,14 @@
+{
+    "ERRORS": {
+        "NO_AUTH": "Invalid auth. ",
+        "COULD_NOT_RESOLVE": "Could not get destination of ",
+        "COULD_NOT_CREATE": "Could not create shortlink. ",
+        "INVALID_ID_PROVIDED": "Invalid ID provided. ",
+        "INVALID_URL_PROVIDED": "Invalid URL provided. ",
+        "ID_ALREADY_USED": "Shortlink id already in use. ",
+        "CHECK_PARAMETERS": "Check parameters or try again later. "
+    },
+    "SUCCESS": {
+        "SHORTLINK_CREATED": "Shortlink successfully created."
+    }
+}

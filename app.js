@@ -63,9 +63,41 @@ const generateUUID = () => {
 //Middleman function to start link creation process
 const generateShortlink = async (id, url, auth) => {
 
-    //Check parameters
-    //Check auth //ToDo: Real Authentification
+    //No URL => Exit
+    if(!url) return CONSTANTS.ERRORS.INVALID_URL_PROVIDED;
+
+    //Check if any ID is provided
     if(id && !auth) return CONSTANTS.ERRORS.NO_AUTH;
+
+    //Generate UUID if empty
+    id = id ? id : generateUUID();
+
+    //ID Already used?
+    return FIREBASE_getShort(id)
+    .then((snap) => {
+
+        //ID Already taken?
+        if(snap) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.ID_ALREADY_USED;
+        else return true;
+
+    //Not taken => Create shortlink
+    }).then((snap) => {
+
+        //Create shortlink
+        return FIREBASE_setShort(id, url)
+        .then((snap) => {
+
+            //Successfully created?
+            if(!snap) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.CHECK_PARAMETERS;
+            return true;
+
+        }).catch((err) => {
+            throw err;
+        });
+
+    }).catch((err) => {
+        throw err;
+    });
 
 }
 
@@ -97,34 +129,12 @@ EXPRESS.post(CONFIG.ROUTES.POST_LINK, (req, res) => {
     let url = req.body.url;
     let auth = req.body.auth;
 
-    //Parameters may be invalid
-    if(!id) return res.status(400).send(CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.INVALID_ID_PROVIDED);
-    else if(!url) return res.status(400).send(CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.INVALID_URL_PROVIDED);
-
-    //ID already used?
-    FIREBASE_getShort(id)
+    generateShortlink(id, url, 'auth')
     .then((snap) => {
-        if(!snap) return;
-        else throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.ID_ALREADY_USED;
-
-    //Unused
-    }).then((snap) => {
-        //Do URL manipulation
-        url = addHttp(url); //Add secure https://
-
-        //Create URL
-        FIREBASE_setShort(id, url)
-        .then((snap) => {
-            if(snap) return res.status(201).send(CONSTANTS.SUCCESS.SHORTLINK_CREATED);
-            else throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.CHECK_PARAMETERS;
-        }).catch((err) => {
-            return res.status(504).send(err);
-        });
-    })
-
-    //Error if id is already used
-    .catch((err) => {
-        return res.status(500).send(err);
+        if(snap) res.status(201).send(CONSTANTS.SUCCESS.SHORTLINK_CREATED);
+        else throw snap;
+    }).catch((err) => {
+        res.status(504).send(err);
     });
 });
 

@@ -68,10 +68,10 @@ EXPRESS.get('/api/get/:id', (req, res) => {
     const id = req.params.id;
 
     getShort(id).then((snap) => {
-        if(snap) return res.send(snap)
+        if(snap) return res.status(200).send(snap)
         else throw `Could not get destination of "${id}"`
     }).catch((err) => {
-        return res.send(err);
+        return res.status(404).send(err);
     });
 });
 
@@ -84,8 +84,8 @@ EXPRESS.post('/api/post', (req, res) => {
     let url = req.body.url;
 
     //Parameters may be invalid
-    if(!id) return res.send('Could not create shortlink. Invalid ID provided.');
-    else if(!url) return res.send('Could not create shortlink. Invalid URL provided.');
+    if(!id) return res.status(400).send('Could not create shortlink. Invalid ID provided.');
+    else if(!url) return res.status(400).send('Could not create shortlink. Invalid URL provided.');
 
     //ID already used?
     getShort(id)
@@ -101,16 +101,16 @@ EXPRESS.post('/api/post', (req, res) => {
         //Create URL
         setShort(id, url)
         .then((snap) => {
-            if(snap) return res.send('Shortlink successfully created.');
+            if(snap) return res.status(201).send('Shortlink successfully created.');
             else throw 'Could not create shortlink. Check parameters or try again later.';
         }).catch((err) => {
-            return res.end(err);
+            return res.status(504).send(err);
         });
     })
 
     //Error if id is already used
     .catch((err) => {
-        return res.end(err);
+        return res.status(500).send(err);
     });
 });
 

@@ -1,4 +1,4 @@
-// Init Firebase
+//Init Firebase
 const FIREBASE_ADMIN = require('firebase-admin');
 const SERVICE_ACCOUNT = require('./config/service_account.json');
 
@@ -10,6 +10,7 @@ FIREBASE_ADMIN.initializeApp({
 const FIRESTORE = FIREBASE_ADMIN.firestore();
 const DATABASE = FIRESTORE.collection('shortthis');
 
+//FIREBASE FUNCTIONS
 //Get destination URL from short ID
 const getShort = async (id) => {
     return DATABASE.doc(id).get()
@@ -34,6 +35,7 @@ const setShort = async (id, url) => {
     });
 };
 
+//LOCAL FUNCTIONS
 //Checks if URL is https (secure) URL
 const isSecureURL = (url) => {
     return url.indexOf('https://') != -1 ? true : false;
@@ -47,6 +49,11 @@ const upgradeSecureURL = (url) => {
 //Add https to URL which don't contain any
 const addHttp = (url) => {
     return (url.indexOf('https://') == -1 && url.indexOf('http://') == -1) ? 'https://' + url : upgradeSecureURL(url);
+}
+
+//Generate UUID for shortlinks
+const generateUUID = () => {
+    return Math.floor(Math.random() * 36 * 100000).toString(36).toUpperCase();
 }
 
 //Express Server
@@ -68,6 +75,7 @@ EXPRESS.get('/api/get/:id', (req, res) => {
     });
 });
 
+//SERVER FUNCTIONS
 //Create URls
 EXPRESS.post('/api/post', (req, res) => {
     

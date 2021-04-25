@@ -77,7 +77,7 @@ const prepareURL = (url) => {
 //Is chained?
 const isChained = (url) => {
     url = addHttp(url);
-    return url.indexOf('https://shortthis.link') != -1;
+    return url.indexOf('https://' + CONFIG.DOMAIN) != -1;
 }
 
 //Upgrade unsecure (http://) URL to more secure (https://)

@@ -1,2 +1,5 @@
 # shortthis-api
-Private development repository for shortthis backend API
+Development repository for shortthis backend API
+
+# Documentation
+https://github.com/unpacked-dev/shortthis-api/wiki

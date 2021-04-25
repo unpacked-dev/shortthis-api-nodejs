@@ -151,7 +151,7 @@ const generateShortlink = async (id, url, auth) => {
     .then((snap) => {
 
         //ID Already taken?
-        if(snap) {
+        if(snap.status == 200) {
             short.comment = CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.ID_ALREADY_USED;
             short.status = 400;
             throw short;

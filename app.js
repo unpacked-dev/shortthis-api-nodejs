@@ -45,6 +45,12 @@ const isSecureURL = (url) => {
     return url.indexOf('https://') != -1 ? true : false;
 };
 
+//Is chained?
+const isChained = (url) => {
+    url = addHttp(url);
+    return url.indexOf('https://shortthis.link') != -1;
+}
+
 //Upgrade unsecure (http://) URL to more secure (https://) URL
 const upgradeSecureURL = (url) => {
     return url.replaceAll('http://', 'https://');
@@ -65,6 +71,8 @@ const generateShortlink = async (id, url, auth) => {
 
     //No URL => Exit
     if(!url) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.INVALID_URL_PROVIDED;
+
+    if(isChained(url)) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.CHAINED_SHORTLINK;
 
     //Manipulate URL
     url = addHttp(url);

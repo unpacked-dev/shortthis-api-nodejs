@@ -6,7 +6,8 @@
         "INVALID_ID_PROVIDED": "Invalid ID provided. ",
         "INVALID_URL_PROVIDED": "Invalid URL provided. ",
         "ID_ALREADY_USED": "Shortlink id already in use. ",
-        "CHECK_PARAMETERS": "Check parameters or try again later. "
+        "CHECK_PARAMETERS": "Check parameters or try again later. ",
+        "CHAINED_SHORTLINK": "Can not create a shortlink of a shortlink URL. "
     },
     "SUCCESS": {
         "SHORTLINK_CREATED": "Shortlink successfully created."

@@ -10,14 +10,15 @@ https://nodejs.org/en/
 2. Create the serviceworker config file <br>
 - "Project settings" -> "Service worker" -> "Create private key" <br>
 - Rename file to "service_account.json" and paste it into the config folder
-4. Create a Firebase "Firestore Database"
-5. Create a collection on your database named "shortthis"
-6. Download latest release of shortthis-api https://github.com/unpacked-dev/shortthis-api/releases
-7. Install dependencies <br>
+3. Create a Firebase "Firestore Database"
+4. Create a collection on your database named "shortthis"
+5. Download latest release of shortthis-api https://github.com/unpacked-dev/shortthis-api/releases
+6. Install dependencies <br>
 `cd $YOUR_FOLDER$` <br>
 `npm i express` <br>
 `npm i firebase-admin` <br>
-6. Run shortthis <br>
+7. Edit your config.json file https://github.com/unpacked-dev/shortthis-api/wiki/Config-file
+8. Run shortthis <br>
 `node app.js`
 
 # Documentation

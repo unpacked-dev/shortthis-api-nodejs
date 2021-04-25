@@ -14,12 +14,20 @@ https://nodejs.org/en/
 4. Create a collection on your database named "shortthis"
 5. Download latest release of shortthis-api https://github.com/unpacked-dev/shortthis-api/releases
 6. Install dependencies <br>
-`cd $YOUR_FOLDER$` <br>
-`npm i express` <br>
-`npm i firebase-admin` <br>
+```
+cd $YOUR_FOLDER$
+```
+```
+npm i express
+```
+```
+npm i firebase-admin
+```
 7. Edit your config.json file https://github.com/unpacked-dev/shortthis-api/wiki/Config-file
 8. Run shortthis <br>
-`node app.js`
+```
+node app.js
+```
 
 # Documentation
 https://github.com/unpacked-dev/shortthis-api/wiki

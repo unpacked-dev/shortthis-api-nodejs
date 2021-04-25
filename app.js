@@ -81,7 +81,7 @@ const generateShortlink = async (id, url, auth) => {
 
         //ID Already taken?
         if(snap) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.ID_ALREADY_USED;
-        else return true;
+        return true;
 
     //Not taken => Create shortlink
     }).then((snap) => {
@@ -118,7 +118,7 @@ EXPRESS.get(CONFIG.ROUTES.GET_ID, (req, res) => {
 
     FIREBASE_getShort(id).then((snap) => {
         if(snap) return res.status(200).send(snap)
-        else throw `${CONSTANTS.ERRORS.COULD_NOT_RESOLVE} "${id}".`
+        throw `${CONSTANTS.ERRORS.COULD_NOT_RESOLVE} "${id}".`
     }).catch((err) => {
         return res.status(404).send(err);
     });
@@ -135,8 +135,11 @@ EXPRESS.post(CONFIG.ROUTES.POST_LINK, (req, res) => {
 
     generateShortlink(id, url, auth)
     .then((snap) => {
-        if(snap) res.status(201).send(CONSTANTS.SUCCESS.SHORTLINK_CREATED);
-        else throw snap;
+        if(snap) {
+            res.status(201).send(CONSTANTS.SUCCESS.SHORTLINK_CREATED);
+            return true;
+        }
+        throw snap;
     }).catch((err) => {
         res.status(504).send(err);
     });

@@ -2,7 +2,7 @@
     "DOMAIN": "shortthis.link",
     "EXPRESS": {
         "PORT": 3000,
-        "LOG_SERVER_RUNNING": "Shortthis server listening at http://localhost:"
+        "LOG_SERVER_RUNNING": "Shortthis server listening at port "
     },
     "ROUTES": {
         "GET_ID": "/api/get/:id",

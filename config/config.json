@@ -1,7 +1,4 @@
 {
-    "FIREBASE": {
-        "DATABASE_URL": "https://shortthis-d96bc-default-rtdb.europe-west1.firebasedatabase.app"
-    },
     "EXPRESS": {
         "PORT": 3000,
         "LOG_SERVER_RUNNING": "Shortthis server listening at http://localhost:"

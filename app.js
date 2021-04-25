@@ -8,7 +8,6 @@ const SERVICE_ACCOUNT = require('./config/service_account.json');
 
 FIREBASE_ADMIN.initializeApp({
   credential: FIREBASE_ADMIN.credential.cert(SERVICE_ACCOUNT),
-  databaseURL: CONFIG.FIREBASE.DATABASE_URL,
 });
 
 const FIRESTORE = FIREBASE_ADMIN.firestore();

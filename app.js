@@ -16,12 +16,20 @@ const DATABASE = FIRESTORE.collection('shortthis');
 //FIREBASE FUNCTIONS
 //Get destination URL from short ID
 const FIREBASE_getShort = async (id) => {
+    let short = new Short();
+
     return DATABASE.doc(id).get()
     .then((snap) => {
-        return snap.data().url;
+        short.id = id;
+        short.comment = 'success';
+        short.status = 200;
+        short.url = snap.data().url;
+        return short;
     })
     .catch((err) => {
-        return null;
+        short.comment = `${CONSTANTS.ERRORS.COULD_NOT_RESOLVE}'${id}'`;
+        short.status = 504;
+        return short;
     });
 };
 
@@ -39,6 +47,15 @@ const FIREBASE_setShort = async (id, url) => {
 };
 
 //LOCAL FUNCTIONS
+class Short {
+    constructor(status, comment, id, url) {
+        this.status = status;
+        this.id = id;
+        this.url = url;
+        this.comment = comment;
+    }
+};
+
 //Checks if URL is https (secure) URL
 const isSecureURL = (url) => {
     url = url.toLowerCase();
@@ -100,17 +117,31 @@ const generateUUID = () => {
 //Middleman function to start link creation process
 const generateShortlink = async (id, url, auth) => {
 
+    let short = new Short();
+
     //No URL => Exit
-    if(!url) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.INVALID_URL_PROVIDED;
+    if(!url) {
+        short.comment = CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.INVALID_URL_PROVIDED;
+        short.status = 400;
+        throw short;
+    }
 
     //Manipulate URL
     url = prepareURL(url);
     url = upgradeSecureURL(url);
 
-    if(isChained(url)) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.CHAINED_SHORTLINK;
+    if(isChained(url)) {
+        short.comment = CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.CHAINED_SHORTLINK;
+        short.status = 400;
+        throw short;
+    }
 
     //Check if any ID is provided
-    if(id && !auth) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.NO_AUTH;
+    if(id && !auth) {
+        short.comment = CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.NO_AUTH;
+        short.status = 401;
+        throw short;
+    }
 
     //Generate UUID if empty
     id = id ? id : generateUUID();
@@ -120,7 +151,11 @@ const generateShortlink = async (id, url, auth) => {
     .then((snap) => {
 
         //ID Already taken?
-        if(snap) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.ID_ALREADY_USED;
+        if(snap) {
+            short.comment = CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.ID_ALREADY_USED;
+            short.status = 400;
+            throw short;
+        }
         return true;
 
     //Not taken => Create shortlink
@@ -131,8 +166,16 @@ const generateShortlink = async (id, url, auth) => {
         .then((snap) => {
 
             //Successfully created?
-            if(!snap) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.CHECK_PARAMETERS;
-            return true;
+            if(!snap) {
+                short.comment = CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.CHECK_PARAMETERS;
+                short.status = 504;
+                throw short;
+            }
+            short.comment = CONSTANTS.SUCCESS.SHORTLINK_CREATED;
+            short.status = 201;
+            short.id = id;
+            short.url = url;
+            return short;
 
         }).catch((err) => {
             throw err;
@@ -157,10 +200,12 @@ EXPRESS.get(CONFIG.ROUTES.GET_ID, (req, res) => {
     const id = req.params.id;
 
     FIREBASE_getShort(id).then((snap) => {
-        if(snap) return res.status(200).send(snap)
-        throw `${CONSTANTS.ERRORS.COULD_NOT_RESOLVE} "${id}".`
+        if(snap.status == 200) {
+            return res.status(snap.status).send(snap)
+        }
+        throw snap;
     }).catch((err) => {
-        return res.status(404).send(err);
+        return res.status(err.status).send(err);
     });
 });
 
@@ -175,13 +220,13 @@ EXPRESS.post(CONFIG.ROUTES.POST_LINK, (req, res) => {
 
     generateShortlink(id, url, auth)
     .then((snap) => {
-        if(snap) {
-            res.status(201).send(CONSTANTS.SUCCESS.SHORTLINK_CREATED);
+        if(snap.status == 201) {
+            res.status(snap.status).send(snap);
             return true;
         }
         throw snap;
     }).catch((err) => {
-        res.status(504).send(err);
+        res.status(err.status).send(err);
     });
 });
 

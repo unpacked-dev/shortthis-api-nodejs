@@ -42,8 +42,38 @@ const FIREBASE_setShort = async (id, url) => {
 //LOCAL FUNCTIONS
 //Checks if URL is https (secure) URL
 const isSecureURL = (url) => {
+    url = url.toLowerCase();
     return url.indexOf('https://') != -1 ? true : false;
 };
+
+//Get Domain URL
+const getURLHostname = (url) => {
+    url = url.toLowerCase();
+    url = url.replaceAll('https://', '');
+    url = url.replaceAll('http://', '');
+    return url.split('/')[0];
+}
+
+//Checks if URL starts with https OR https
+const urlIsHttpProtocol = (url) => {
+    url = url.toLowerCase();
+    return (url.indexOf('https://') != -1 || url.indexOf('http://') != -1) ? true : false;
+}
+
+//Prepare URL for shortening
+const prepareURL = (url) => {
+    let hostname = getURLHostname(url);
+    let startsWithHttp = urlIsHttpProtocol(url);
+    let isSecure = isSecureURL(url);
+    let protocolAndHostname = startsWithHttp && isSecure ? 'https://' + hostname : hostname;
+    protocolAndHostname = startsWithHttp && !isSecure ? 'http://' + hostname : protocolAndHostname;
+
+    url = url.split("");
+    url.splice(0, protocolAndHostname.length);
+    url = url.join("");
+    url = startsWithHttp ? protocolAndHostname + url : 'https://' + hostname + url;
+    return url;
+}
 
 //Is chained?
 const isChained = (url) => {
@@ -51,12 +81,14 @@ const isChained = (url) => {
     return url.indexOf('https://shortthis.link') != -1;
 }
 
-//Upgrade unsecure (http://) URL to more secure (https://) URL
+//Upgrade unsecure (http://) URL to more secure (https://)
+//URL !RUN prepareURL(url) FIRST!
 const upgradeSecureURL = (url) => {
     return url.replaceAll('http://', 'https://');
 }
 
 //Add https to URL which don't contain any
+//!RUN prepareURL(url) FIRST!
 const addHttp = (url) => {
     return (url.indexOf('https://') == -1 && url.indexOf('http://') == -1) ? 'https://' + url : upgradeSecureURL(url);
 }
@@ -72,10 +104,11 @@ const generateShortlink = async (id, url, auth) => {
     //No URL => Exit
     if(!url) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.INVALID_URL_PROVIDED;
 
-    if(isChained(url)) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.CHAINED_SHORTLINK;
-
     //Manipulate URL
-    url = addHttp(url);
+    url = prepareURL(url);
+    url = upgradeSecureURL(url);
+
+    if(isChained(url)) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.CHAINED_SHORTLINK;
 
     //Check if any ID is provided
     if(id && !auth) throw CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.NO_AUTH;

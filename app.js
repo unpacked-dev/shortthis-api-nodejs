@@ -108,6 +108,7 @@ const generateShortlink = async (id, url, auth) => {
 const express = require('express');
 const EXPRESS = express();
 EXPRESS.use(express.urlencoded({extended: true}));
+EXPRESS.use(express.json());
 const EXPRESS_PORT = CONFIG.EXPRESS.PORT;
 
 //Routing

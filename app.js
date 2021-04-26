@@ -12,6 +12,7 @@ FIREBASE_ADMIN.initializeApp({
 
 const FIRESTORE = FIREBASE_ADMIN.firestore();
 const DATABASE = FIRESTORE.collection('shortthis');
+let Short = require('./short.js');
 
 //FIREBASE FUNCTIONS
 //Get destination URL from short ID
@@ -36,7 +37,7 @@ const FIREBASE_getShort = async (id) => {
 //Set destination URL to short ID
 const FIREBASE_setShort = async (id, url) => {
     return DATABASE.doc(id).set({
-        url: url,
+        url: url
     })
     .then((snap) => {
         return true;
@@ -46,16 +47,7 @@ const FIREBASE_setShort = async (id, url) => {
     });
 };
 
-//LOCAL FUNCTIONS
-class Short {
-    constructor(status, comment, id, url) {
-        this.status = status;
-        this.id = id;
-        this.url = url;
-        this.comment = comment;
-    }
-};
-
+//LOCAL FUNCTION
 //Checks if URL is https (secure) URL
 const isSecureURL = (url) => {
     url = url.toLowerCase();

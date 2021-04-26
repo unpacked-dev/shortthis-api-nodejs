@@ -8,6 +8,7 @@ https://nodejs.org/en/
 ### Install shorthis API server
 1. Create your Project on firebase https://console.firebase.google.com/
 2. Create the serviceworker config file <br>
+- Navigate to your Firebase console: https://console.firebase.google.com/
 - "Project settings" -> "Service worker" -> "Create private key" <br>
 - Rename file to "service_account.json" and paste it into the config folder
 3. Create a Firebase "Firestore Database"

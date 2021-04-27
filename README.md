@@ -12,9 +12,10 @@ https://nodejs.org/en/
 - "Project settings" -> "Service worker" -> "Create private key" <br>
 - Rename file to "service_account.json" and paste it into the config folder
 3. Create a Firebase "Firestore Database"
-4. Create a collection on your database named "shortthis"
-5. Download latest release of shortthis-api https://github.com/unpacked-dev/shortthis-api/releases
-6. Install dependencies <br>
+4. Create a collection on your database named "shortthis" (This will be your collection for the shortlinks)
+5. Create a collection on your database named "shortthis-auth" (This will be your collection for the auth tokens)
+6. Download latest release of shortthis-api https://github.com/unpacked-dev/shortthis-api/releases
+7. Install dependencies <br>
 ```
 cd $YOUR_FOLDER$
 ```

@@ -7,7 +7,8 @@ FIREBASE_ADMIN.initializeApp({
 });
 
 const FIRESTORE = FIREBASE_ADMIN.firestore();
-const DATABASE = FIRESTORE.collection('shortthis');
+const DATABASE_SHORT = FIRESTORE.collection('shortthis');
+const DATABASE_AUTH = FIRESTORE.collection('shortthis-auth');
 
 const Short = require('./short.js');
 const CONSTANTS = require('./config/constants.json');
@@ -16,7 +17,7 @@ const CONSTANTS = require('./config/constants.json');
 const getShort = async (id) => {
     let short = new Short();
 
-    return DATABASE.doc(id).get()
+    return DATABASE_SHORT.doc(id).get()
     .then((snap) => {
         short.id = id;
         short.comment = 'success';
@@ -33,7 +34,7 @@ const getShort = async (id) => {
 
 //Set destination URL to short ID
 const setShort = async (id, url) => {
-    return DATABASE.doc(id).set({
+    return DATABASE_SHORT.doc(id).set({
         url: url
     })
     .then((snap) => {
@@ -44,7 +45,17 @@ const setShort = async (id, url) => {
     });
 };
 
+const getAuth = async (auth) => {
+    return DATABASE_AUTH.doc(auth).get()
+    .then((snap) => {
+        return snap.data();
+    }).catch((err) => {
+        throw err;
+    });
+}
+
 module.exports = {
     getShort,
     setShort,
+    getAuth,
 }

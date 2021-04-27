@@ -72,6 +72,21 @@ const getShortlink = async (id) => {
     });
 }
 
+//Check if Auth is valid
+const isValidAuth = async (auth) => {
+
+    //When there is no auth
+    if(!auth) return true;
+
+    return FIREBASE.getAuth(auth)
+    .then((snap) => {
+        if(snap.auth) return true;
+        return false;
+    }).catch((err) => {
+        return false;
+    });
+}
+
 //Middleman function to start link creation process
 const generateShortlink = async (id, url, auth) => {
 
@@ -94,7 +109,7 @@ const generateShortlink = async (id, url, auth) => {
         throw short;
     }
 
-    //Check if any ID is provided
+    //Custom id but no auth provided?
     if(id && !auth) {
         short.comment = CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.NO_AUTH;
         short.status = 401;
@@ -104,17 +119,35 @@ const generateShortlink = async (id, url, auth) => {
     //Generate UUID if empty
     id = id ? id : generateUUID();
 
-    //ID Already used?
-    return getShortlink(id)
+    //Check Auth
+    return isValidAuth(auth)
     .then((snap) => {
 
-        //ID Already taken?
-        if(snap.status == 200) {
-            short.comment = CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.ID_ALREADY_USED;
-            short.status = 400;
-            throw short;
-        }
-        return true;
+        //Auth success
+        if(snap) return true;
+
+        //Auth failed
+        short.comment = CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.NO_AUTH;
+        short.status = 401;
+        throw short;
+
+    }).then((snap) => {
+
+        //ID Already used?
+        return getShortlink(id)
+        .then((snap) => {
+
+            //ID Already taken?
+            if(snap.status == 200) {
+                short.comment = CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.ID_ALREADY_USED;
+                short.status = 400;
+                throw short;
+            }
+
+            return true;
+        }).catch((err) => {
+            throw err;
+        });
 
     //Not taken => Create shortlink
     }).then((snap) => {
@@ -129,6 +162,7 @@ const generateShortlink = async (id, url, auth) => {
                 short.status = 504;
                 throw short;
             }
+
             short.comment = CONSTANTS.SUCCESS.SHORTLINK_CREATED;
             short.status = 201;
             short.id = id;

@@ -11,5 +11,8 @@
     },
     "SUCCESS": {
         "SHORTLINK_CREATED": "Shortlink successfully created."
+    },
+    "TEXT": {
+        "AUTH_UNUSED": "AUTH_UNUSED"
     }
 }

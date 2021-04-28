@@ -27,7 +27,7 @@ const getShort = async (id) => {
     })
     .catch((err) => {
         short.comment = `${CONSTANTS.ERRORS.COULD_NOT_RESOLVE}'${id}'`;
-        short.status = 504;
+        short.status = 404;
         return short;
     });
 };

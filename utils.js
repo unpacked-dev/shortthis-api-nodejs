@@ -103,6 +103,13 @@ const generateShortlink = async (id, url, auth) => {
     url = prepareURL(url);
     url = upgradeSecureURL(url);
 
+    //XSS
+    if(url.indexOf('<') != -1 || url.indexOf('>') != -1) {
+        short.comment = CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.INVALID_URL_PROVIDED;
+        short.status = 400;
+        throw short;
+    }
+
     if(isChained(url)) {
         short.comment = CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.CHAINED_SHORTLINK;
         short.status = 400;
@@ -115,6 +122,9 @@ const generateShortlink = async (id, url, auth) => {
         short.status = 401;
         throw short;
     }
+
+    //If no custom ID, no auth required => dont check for auth
+    if(!id && auth) auth = "";
 
     //Generate UUID if empty
     id = id ? id : generateUUID();
@@ -137,6 +147,8 @@ const generateShortlink = async (id, url, auth) => {
         return getShortlink(id)
         .then((snap) => {
 
+            console.log(snap);
+
             //ID Already taken?
             if(snap.status == 200) {
                 short.comment = CONSTANTS.ERRORS.COULD_NOT_CREATE + CONSTANTS.ERRORS.ID_ALREADY_USED;
@@ -146,7 +158,7 @@ const generateShortlink = async (id, url, auth) => {
 
             return true;
         }).catch((err) => {
-            throw err;
+            return err;
         });
 
     //Not taken => Create shortlink

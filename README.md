@@ -23,6 +23,9 @@ cd $YOUR_FOLDER$
 npm i express
 ```
 ```
+npm i cors
+```
+```
 npm i firebase-admin
 ```
 7. Edit your config.json file https://github.com/unpacked-dev/shortthis-api/wiki/Config-file

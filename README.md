@@ -1,5 +1,5 @@
 # shortthis-api
-Development repository for shortthis backend API
+Easy to use `Nodejs` server for creating shortlinks in a Firebase Firestore database.
 
 # Installation
 ### Install Nodejs
@@ -21,6 +21,9 @@ cd $YOUR_FOLDER$
 ```
 ```
 npm i express
+```
+```
+npm i cors
 ```
 ```
 npm i firebase-admin

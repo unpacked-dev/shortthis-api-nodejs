@@ -58,7 +58,8 @@ const addHttp = (url) => {
 
 //Generate UUID for shortlinks
 const generateUUID = () => {
-    return Math.floor(Math.random() * 36 * 100000).toString(36).toUpperCase();
+    const multiplier = Math.pow(10, CONFIG.UUID_LENGTH);
+    return Math.floor(Math.random() * 36 * multiplier).toString(36).toUpperCase();
 }
 
 const getShortlink = async (id) => {

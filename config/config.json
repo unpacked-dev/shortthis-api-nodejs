@@ -7,5 +7,6 @@
     "ROUTES": {
         "GET_ID": "/api/get/:id",
         "POST_LINK": "/api/post"
-    }
+    },
+    "UUID_LENGTH": 5
 }
